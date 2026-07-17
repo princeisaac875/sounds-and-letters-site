@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>I Can Associate Sounds With Letters — Learning Site</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#FFF4E0;
+    --paper:#FFE8BE;
+    --paper-dark:#FCD9A0;
+    --orange:#F2884B;
+    --deep-orange:#E85D2C;
+    --yellow:#FFC93C;
+    --brown:#4A3222;
+    --brown-soft:#7A5A3E;
+    --green:#6FCC92;
+    --white:#FFFFFF;
+    --sky:#FFF0DA;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Quicksand',sans-serif;
+    background:var(--sky);
+    color:var(--brown);
+    overflow-x:hidden;
+  }
+  h1,h2,h3,.display{
+    font-family:'Baloo 2',cursive;
+    color:var(--deep-orange);
+    margin:0;
+  }
+  /* ---------- Background sun & clouds ---------- */
+  .sun{
+    position:fixed; top:-80px; right:-80px; width:260px; height:260px;
+    background:radial-gradient(circle at 40% 40%, #FFE082, var(--yellow));
+    border-radius:50%;
+    box-shadow:0 0 60px 20px rgba(255,201,60,0.35);
+    z-index:0;
+  }
+  .cloud{
+    position:fixed; background:#fff; border-radius:50px; opacity:0.7; z-index:0;
+  }
+  .cloud::before, .cloud::after{
+    content:""; position:absolute; background:#fff; border-radius:50%;
+  }
+  .cloud1{ width:120px; height:40px; top:60px; left:8%; }
+  .cloud1::before{ width:60px; height:60px; top:-30px; left:15px; }
+  .cloud1::after{ width:40px; height:40px; top:-18px; left:65px; }
+  .cloud2{ width:90px; height:32px; top:180px; right:12%; }
+  .cloud2::before{ width:44px; height:44px; top:-22px; left:10px; }
+
+  /* ---------- Nav ---------- */
+  .topbar{
+    position:sticky; top:0; z-index:50;
+    background:rgba(255,244,224,0.92);
+    backdrop-filter: blur(4px);
+    padding:14px 18px;
+    display:flex; align-items:center; justify-content:center; gap:10px;
+    flex-wrap:wrap;
+    border-bottom:3px dashed var(--paper-dark);
+  }
+  .nav-btn{
+    font-family:'Baloo 2',cursive;
+    font-size:16px;
+    background:var(--white);
+    border:3px solid var(--orange);
+    color:var(--deep-orange);
+    padding:8px 18px;
+    border-radius:999px;
+    cursor:pointer;
+    transition: transform .15s ease, background .15s ease, color .15s ease;
+    box-shadow:0 3px 0 var(--paper-dark);
+  }
+  .nav-btn:hover{ transform:translateY(-2px); }
+  .nav-btn.active{
+    background:var(--deep-orange);
+    color:#fff;
+    border-color:var(--deep-orange);
+  }
+
+  main{
+    position:relative; z-index:1;
+    max-width:920px; margin:0 auto; padding:30px 20px 90px;
+  }
+  section{ display:none; animation:fadeIn .4s ease; }
+  section.active{ display:block; }
+  @keyframes fadeIn{ from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);} }
+
+  .card{
+    background:var(--white);
+    border-radius:28px;
+    padding:26px 28px;
+    margin-bottom:22px;
+    box-shadow: 0 10px 0 var(--paper-dark), 0 14px 24px rgba(74,50,34,0.08);
+    border:3px solid var(--paper-dark);
+  }
+  .badge{
+    display:inline-block;
+    background:var(--yellow);
+    color:var(--brown);
+    font-family:'Baloo 2',cursive;
+    font-weight:700;
+    padding:6px 16px;
+    border-radius:999px;
+    font-size:14px;
+    margin-bottom:10px;
+  }
+  p{ line-height:1.55; font-size:16px; }
+  ul{ padding-left:20px; }
+  li{ margin-bottom:6px; line-height:1.5; }
+
+  /* ---------- Home ---------- */
+  .hero{
+    text-align:center;
+    padding:20px 10px 6px;
+  }
+  .hero h1{ font-size:42px; }
+  .hero .sub{ font-size:20px; color:var(--brown-soft); margin-top:6px; }
+  .speech-bubble{
+    position:relative;
+    background:var(--white);
+    border:3px solid var(--orange);
+    border-radius:20px;
+    padding:14px 18px;
+    max-width:360px;
+    margin:18px auto;
+    font-family:'Baloo 2', cursive;
+    font-size:17px;
+    color:var(--deep-orange);
+  }
+  .speech-bubble::after{
+    content:"";
+    position:absolute; bottom:-16px; left:50%; transform:translateX(-50%);
+    border-width:16px 12px 0 12px;
+    border-style:solid;
+    border-color:var(--orange) transparent transparent transparent;
+  }
+  .start-btn{
+    font-family:'Baloo 2',cursive;
+    font-size:20px;
+    background:var(--deep-orange);
+    color:#fff;
+    border:none;
+    padding:14px 34px;
+    border-radius:999px;
+    cursor:pointer;
+    box-shadow:0 5px 0 #B84117;
+    margin-top:14px;
+    transition:transform .1s ease;
+  }
+  .start-btn:active{ transform:translateY(4px); box-shadow:0 1px 0 #B84117; }
+
+  .meta-grid{
+    display:grid; grid-template-columns:1fr 1fr; gap:10px 20px;
+    margin-top:18px; font-size:15px;
+  }
+  .meta-grid div span{ font-weight:700; color:var(--deep-orange); }
+
+  /* ---------- Mascot ---------- */
+  .mascot{ width:150px; margin:0 auto; display:block; }
+  .mascot-small{ width:90px; }
+  .bounce{ animation: bounce 2.2s ease-in-out infinite; }
+  @keyframes bounce{ 0%,100%{transform:translateY(0);} 50%{transform:translateY(-10px);} }
+
+  /* ---------- Letter wall / balloons ---------- */
+  .balloon-grid{
+    display:flex; flex-wrap:wrap; gap:18px; justify-content:center; margin-top:16px;
+  }
+  .balloon{
+    width:110px; height:130px;
+    border-radius:50% 50% 50% 50% / 55% 55% 45% 45%;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    color:#fff; font-family:'Baloo 2',cursive;
+    cursor:pointer; border:none; position:relative;
+    box-shadow: inset -8px -8px 0 rgba(0,0,0,0.06);
+    transition: transform .15s ease;
+  }
+  .balloon:hover{ transform:scale(1.06) rotate(-2deg); }
+  .balloon .letter{ font-size:34px; font-weight:800; }
+  .balloon .emoji{ font-size:26px; margin-top:2px; }
+  .balloon::after{
+    content:""; position:absolute; bottom:-14px; left:50%; transform:translateX(-50%);
+    width:2px; height:16px; background:var(--brown-soft);
+  }
+  .confetti{
+    position:absolute; width:8px; height:8px; border-radius:2px; pointer-events:none;
+    animation: pop .7s ease-out forwards;
+  }
+  @keyframes pop{
+    0%{ transform:translate(0,0) scale(1); opacity:1; }
+    100%{ transform: translate(var(--dx), var(--dy)) scale(0.4); opacity:0; }
+  }
+
+  /* ---------- Video embed ---------- */
+  .video-wrap{
+    position:relative; padding-bottom:56.25%; height:0; border-radius:20px; overflow:hidden;
+    border:4px solid var(--paper-dark); margin-top:14px;
+  }
+  .video-wrap iframe{ position:absolute; top:0; left:0; width:100%; height:100%; border:0; }
+
+  /* ---------- Play: matching game ---------- */
+  .game-picture{
+    font-size:70px; text-align:center; margin:10px 0;
+  }
+  .choice-row{ display:flex; gap:14px; justify-content:center; flex-wrap:wrap; margin-top:6px; }
+  .choice-btn{
+    font-family:'Baloo 2',cursive; font-size:26px; font-weight:800;
+    width:64px; height:64px; border-radius:16px;
+    border:3px solid var(--orange); background:#fff; color:var(--deep-orange);
+    cursor:pointer; transition: all .15s ease;
+  }
+  .choice-btn:hover{ background:var(--yellow); }
+  .feedback{
+    text-align:center; font-family:'Baloo 2',cursive; font-size:18px; min-height:28px; margin-top:10px;
+  }
+  .feedback.good{ color:#2E9B5C; }
+  .feedback.retry{ color:var(--deep-orange); }
+  .score-pill{
+    display:inline-block; background:var(--green); color:#fff; font-family:'Baloo 2',cursive;
+    padding:5px 14px; border-radius:999px; font-size:14px; margin-left:8px;
+  }
+  .next-btn{
+    display:block; margin:16px auto 0;
+    font-family:'Baloo 2',cursive; background:var(--white); border:3px solid var(--brown-soft);
+    color:var(--brown-soft); padding:8px 20px; border-radius:999px; cursor:pointer;
+  }
+
+  .activity-item{
+    display:flex; gap:14px; align-items:flex-start; margin-bottom:16px;
+    background:var(--cream); border-radius:18px; padding:14px 16px;
+  }
+  .activity-item .icon{ font-size:30px; }
+
+  .checklist li{ list-style:none; margin-bottom:8px; }
+  .checklist{ padding-left:0; }
+  .checklist li::before{ content:"☐  "; }
+
+  footer{
+    text-align:center; padding:20px; font-size:13px; color:var(--brown-soft);
+    position:relative; z-index:1;
+  }
+</style>
+</head>
+<body>
+
+<div class="sun"></div>
+<div class="cloud cloud1"></div>
+<div class="cloud cloud2"></div>
+
+<div class="topbar">
+  <button class="nav-btn active" data-target="home">🏠 Home</button>
+  <button class="nav-btn" data-target="about">ℹ️ About</button>
+  <button class="nav-btn" data-target="learn">📖 Learn</button>
+  <button class="nav-btn" data-target="play">🎮 Play</button>
+  <button class="nav-btn" data-target="reflect">💭 Reflect</button>
+</div>
+
+<main>
+
+  <!-- ============ HOME ============ -->
+  <section id="home" class="active">
+    <div class="hero">
+      <svg class="mascot bounce" viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="100" cy="205" rx="55" ry="10" fill="#E8CDA0" opacity="0.5"/>
+        <path d="M55 130 Q100 100 145 130 L150 210 Q100 230 50 210 Z" fill="#F2884B"/>
+        <circle cx="100" cy="85" r="52" fill="#F7C89B"/>
+        <path d="M50 70 Q100 20 150 70 Q145 45 100 40 Q55 45 50 70Z" fill="#4A3222"/>
+        <circle cx="82" cy="88" r="6" fill="#4A3222"/>
+        <circle cx="118" cy="88" r="6" fill="#4A3222"/>
+        <path d="M78 105 Q100 122 122 105" stroke="#4A3222" stroke-width="4" fill="none" stroke-linecap="round"/>
+        <circle cx="70" cy="100" r="8" fill="#F2884B" opacity="0.5"/>
+        <circle cx="130" cy="100" r="8" fill="#F2884B" opacity="0.5"/>
+      </svg>
+      <h1>Let's Play With Sounds and Letters!</h1>
+      <p class="sub">A Digital Learning Adventure for Little Explorers (Ages 5–6)</p>
+      <div class="speech-bubble">Hi friend! I'm Sunny 🌞 Ready to learn letters and sounds with me?</div>
+      <button class="start-btn" onclick="showSection('learn')">Start Learning →</button>
+    </div>
+
+    <div class="card">
+      <div class="badge">Coursework Details</div>
+      <div class="meta-grid">
+        <div><span>Student:</span> Nantaba Mariam</div>
+        <div><span>Reg. No:</span> 2026/MT01/0148U</div>
+        <div><span>Course Unit:</span> DCEX1103 – ICTs in ECCE</div>
+        <div><span>Study Centre:</span> COSA Nursery TTC</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ABOUT ============ -->
+  <section id="about">
+    <div class="card">
+      <div class="badge">Target Competence</div>
+      <h2>"I can associate sounds with letters."</h2>
+      <p style="margin-top:14px;">This learning experience is designed for children aged <strong>5–6 years</strong>. It helps children recognize letter sounds, identify beginning sounds in words, and connect sounds to written letters — through play, music, images and guided digital activities.</p>
+    </div>
+    <div class="card">
+      <h3>ICT Tools & Platforms Used</h3>
+      <ul>
+        <li>Google Sites — the site builder itself</li>
+        <li>YouTube — embedded phonics songs & videos</li>
+        <li>Original interactive sound-letter games (built for this site)</li>
+        <li>Text-to-speech audio for letter sounds and words</li>
+        <li>Canva — flashcard & banner images</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ LEARN ============ -->
+  <section id="learn">
+    <div class="card">
+      <div class="badge">Letter Wall 🎈</div>
+      <h2>Tap a Balloon to Hear the Sound!</h2>
+      <p>Click each balloon — listen to the sound, then say it back out loud.</p>
+      <div class="balloon-grid" id="balloonGrid"></div>
+    </div>
+
+    <div class="card">
+      <div class="badge">Sing Along 🎵</div>
+      <h2>Simple Letter Sounds Song</h2>
+      <p>A fun phonics song by Jack Hartmann to sing and move along to.</p>
+      <div class="video-wrap">
+        <iframe src="https://www.youtube.com/embed/5Fd1m8kGCmA" title="Simple Letter Sounds Song" allowfullscreen></iframe>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="badge">Picture Cards 🖼️</div>
+      <h2>Picture–Word Association</h2>
+      <div class="balloon-grid">
+        <div class="activity-item" style="width:150px; flex-direction:column; text-align:center; align-items:center;">
+          <span class="icon">🍎</span><strong>A</strong>pple
+        </div>
+        <div class="activity-item" style="width:150px; flex-direction:column; text-align:center; align-items:center;">
+          <span class="icon">⚽</span><strong>B</strong>all
+        </div>
+        <div class="activity-item" style="width:150px; flex-direction:column; text-align:center; align-items:center;">
+          <span class="icon">🐱</span><strong>C</strong>at
+        </div>
+        <div class="activity-item" style="width:150px; flex-direction:column; text-align:center; align-items:center;">
+          <span class="icon">🐶</span><strong>D</strong>og
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PLAY ============ -->
+  <section id="play">
+    <div class="card">
+      <div class="badge">Match the Sound 🌟</div>
+      <h2>Which letter does this word start with?</h2>
+      <div class="game-picture" id="gamePic">🍎</div>
+      <div class="choice-row" id="choiceRow"></div>
+      <div class="feedback" id="feedback"></div>
+      <div style="text-align:center;">Score: <span class="score-pill" id="scorePill">0 ⭐</span></div>
+    </div>
+
+    <div class="card">
+      <h3>More Play Ideas</h3>
+      <div class="activity-item"><span class="icon">📖</span><div><strong>Storytelling:</strong> Listen to a read-aloud story that repeats letter sounds, like "Chicka Chicka Boom Boom."</div></div>
+      <div class="activity-item"><span class="icon">🎶</span><div><strong>Songs & Rhymes:</strong> Sing along to short rhymes like "Apples and Bananas."</div></div>
+      <div class="activity-item"><span class="icon">🎤</span><div><strong>Voice Recording:</strong> With a parent's help, record yourself saying 3 words that start with your favourite letter.</div></div>
+      <div class="activity-item"><span class="icon">🏡</span><div><strong>Home Hunt:</strong> Find 3 things at home that start with the letter B. Show your teacher a photo!</div></div>
+    </div>
+  </section>
+
+  <!-- ============ REFLECT ============ -->
+  <section id="reflect">
+    <div class="card">
+      <div class="badge">Teacher's Reflection</div>
+      <h2>Reflecting on the Learning Experience</h2>
+      <p><em>(Starter draft — personalize this in your own words before submitting)</em></p>
+      <p><strong>Effectiveness:</strong> This learning experience supported the competence "I can associate sounds with letters" by combining sound, image, and movement, so children could engage with letters through more than one sense at once, rather than only seeing them on a page.</p>
+      <p><strong>Children's participation:</strong> I expect children to respond most eagerly to the balloon sounds and the matching game, since both give an immediate, playful response to their actions. Younger learners may need an adult nearby to help them navigate between pages.</p>
+      <p><strong>Strengths:</strong> The site uses a variety of ICT tools (video, sound, interactive games) while staying visually simple and safe for young children, in line with the TPACK framework.</p>
+      <p><strong>Challenges:</strong> Finding free, truly child-safe, ad-free multimedia for this exact age group was not always easy, and internet access may be limited in some home settings.</p>
+      <p><strong>Improvements:</strong> In future, I would add audio in the local language alongside English, and simple guidance notes for parents supporting the child at home.</p>
+    </div>
+  </section>
+
+</main>
+
+<footer>Prototype design for DCEX1103 — ICTs in ECCE • Nantaba Mariam</footer>
+
+<script>
+  // ---------- Navigation ----------
+  const navBtns = document.querySelectorAll('.nav-btn');
+  navBtns.forEach(btn=>{
+    btn.addEventListener('click', ()=> showSection(btn.dataset.target));
+  });
+  function showSection(id){
+    document.querySelectorAll('section').forEach(s=>s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    navBtns.forEach(b=> b.classList.toggle('active', b.dataset.target===id));
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+
+  // ---------- Balloon letter wall ----------
+  const letters = [
+    {l:'A', word:'Apple', emoji:'🍎', color:'#F2884B'},
+    {l:'B', word:'Ball', emoji:'⚽', color:'#FFC93C'},
+    {l:'C', word:'Cat', emoji:'🐱', color:'#6FCC92'},
+    {l:'D', word:'Dog', emoji:'🐶', color:'#E85D2C'},
+    {l:'E', word:'Egg', emoji:'🥚', color:'#F2A65A'},
+  ];
+  const grid = document.getElementById('balloonGrid');
+  letters.forEach(item=>{
+    const b = document.createElement('button');
+    b.className='balloon';
+    b.style.background = item.color;
+    b.innerHTML = `<span class="letter">${item.l}</span><span class="emoji">${item.emoji}</span>`;
+    b.addEventListener('click', (e)=>{
+      speak(item.l + ' says ' + item.l.toLowerCase() + ', like in ' + item.word);
+      confettiBurst(b);
+    });
+    grid.appendChild(b);
+  });
+
+  function confettiBurst(el){
+    const rect = el.getBoundingClientRect();
+    const colors = ['#F2884B','#FFC93C','#6FCC92','#E85D2C'];
+    for(let i=0;i<10;i++){
+      const c = document.createElement('div');
+      c.className='confetti';
+      c.style.background = colors[i%colors.length];
+      c.style.left = (rect.left + rect.width/2 + window.scrollX) + 'px';
+      c.style.top = (rect.top + rect.height/2 + window.scrollY) + 'px';
+      const dx = (Math.random()-0.5)*140;
+      const dy = (Math.random()-0.8)*140;
+      c.style.setProperty('--dx', dx+'px');
+      c.style.setProperty('--dy', dy+'px');
+      document.body.appendChild(c);
+      setTimeout(()=>c.remove(), 700);
+    }
+  }
+
+  function speak(text){
+    if('speechSynthesis' in window){
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      u.rate = 0.85;
+      u.pitch = 1.1;
+      window.speechSynthesis.speak(u);
+    }
+  }
+
+  // ---------- Matching game ----------
+  const gameItems = [
+    {emoji:'🍎', answer:'A', choices:['A','B','C']},
+    {emoji:'⚽', answer:'B', choices:['B','D','A']},
+    {emoji:'🐱', answer:'C', choices:['C','E','B']},
+    {emoji:'🐶', answer:'D', choices:['D','A','C']},
+    {emoji:'🥚', answer:'E', choices:['E','B','D']},
+  ];
+  let gi = 0, score = 0;
+  const gamePic = document.getElementById('gamePic');
+  const choiceRow = document.getElementById('choiceRow');
+  const feedback = document.getElementById('feedback');
+  const scorePill = document.getElementById('scorePill');
+
+  function loadGame(){
+    const item = gameItems[gi % gameItems.length];
+    gamePic.textContent = item.emoji;
+    feedback.textContent = '';
+    feedback.className = 'feedback';
+    choiceRow.innerHTML = '';
+    const shuffled = [...item.choices].sort(()=>Math.random()-0.5);
+    shuffled.forEach(letter=>{
+      const btn = document.createElement('button');
+      btn.className='choice-btn';
+      btn.textContent = letter;
+      btn.addEventListener('click', ()=>{
+        if(letter === item.answer){
+          feedback.textContent = 'Yes! Great listening! 🎉';
+          feedback.className = 'feedback good';
+          score++;
+          scorePill.textContent = score + ' ⭐';
+          speak('Yes! ' + letter + ' is correct!');
+          setTimeout(()=>{ gi++; loadGame(); }, 1100);
+        } else {
+          feedback.textContent = 'Almost — listen again and try once more!';
+          feedback.className = 'feedback retry';
+          speak('Try again!');
+        }
+      });
+      choiceRow.appendChild(btn);
+    });
+  }
+  loadGame();
+</script>
+
+</body>
+</html>
+
