@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sound Safari — I Can Associate Sounds With Letters</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --jungle:#2F6B4F;
+    --jungle-dark:#204E39;
+    --leaf:#6FAE5E;
+    --khaki:#EFE3C4;
+    --khaki-dark:#DFCB99;
+    --sky:#8FD3E8;
+    --coral:#F0765A;
+    --sun:#F2B441;
+    --brown:#5B3E23;
+    --cream:#FBF6E9;
+    --white:#FFFFFF;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:'Nunito',sans-serif; background:var(--cream); color:var(--brown);
+    overflow-x:hidden;
+  }
+  h1,h2,h3,.display{ font-family:'Fredoka',sans-serif; color:var(--jungle-dark); margin:0; }
+
+  /* ---------- background ---------- */
+  .leaf-decor{
+    position:fixed; z-index:0; opacity:0.5; pointer-events:none;
+  }
+  .leaf-decor.tl{ top:-30px; left:-30px; width:180px; }
+  .leaf-decor.br{ bottom:-40px; right:-40px; width:220px; transform:rotate(180deg); }
+
+  /* ---------- Nav (explorer trail) ---------- */
+  .topbar{
+    position:sticky; top:0; z-index:50;
+    background:var(--jungle);
+    padding:14px 16px;
+    display:flex; align-items:center; justify-content:center; gap:8px; flex-wrap:wrap;
+    box-shadow:0 4px 0 var(--jungle-dark);
+  }
+  .nav-btn{
+    font-family:'Fredoka',sans-serif; font-size:15px;
+    background:var(--khaki); border:none; color:var(--jungle-dark);
+    padding:9px 16px; border-radius:10px; cursor:pointer;
+    transition:transform .15s ease, background .15s ease, color .15s ease;
+  }
+  .nav-btn:hover{ transform:translateY(-2px); }
+  .nav-btn.active{ background:var(--sun); color:var(--jungle-dark); }
+
+  main{ position:relative; z-index:1; max-width:940px; margin:0 auto; padding:30px 20px 90px; }
+  section{ display:none; animation:fadeIn .4s ease; }
+  section.active{ display:block; }
+  @keyframes fadeIn{ from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);} }
+
+  .card{
+    background:var(--white); border-radius:22px; padding:26px 28px; margin-bottom:22px;
+    border:3px solid var(--khaki-dark);
+    box-shadow: 0 8px 0 var(--khaki-dark);
+  }
+  .tag{
+    display:inline-block; background:var(--leaf); color:#fff; font-family:'Fredoka',sans-serif;
+    padding:6px 16px; border-radius:999px; font-size:13px; margin-bottom:10px; font-weight:600;
+  }
+  p{ line-height:1.6; font-size:16px; }
+  ul{ padding-left:20px; }
+  li{ margin-bottom:6px; line-height:1.5; }
+
+  /* ---------- Home hero ---------- */
+  .hero{ text-align:center; padding:14px 10px 6px; }
+  .hero h1{ font-size:38px; line-height:1.15; }
+  .hero .sub{ font-size:19px; color:var(--jungle); margin-top:8px; font-weight:700; }
+  .jump-letters{ display:flex; justify-content:center; gap:6px; margin:20px 0 10px; flex-wrap:wrap; }
+  .jump-letters span{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:46px; height:46px; border-radius:12px; font-family:'Fredoka',sans-serif;
+    font-weight:700; font-size:22px; color:#fff;
+    animation: jump 1.4s ease-in-out infinite;
+  }
+  @keyframes jump{ 0%,100%{transform:translateY(0);} 50%{transform:translateY(-14px);} }
+  .explorer-kid{ width:130px; margin:10px auto 0; display:block; }
+  .start-btn{
+    font-family:'Fredoka',sans-serif; font-size:19px; background:var(--coral); color:#fff;
+    border:none; padding:13px 32px; border-radius:999px; cursor:pointer;
+    box-shadow:0 5px 0 #C34B33; margin-top:16px; transition:transform .1s ease;
+  }
+  .start-btn:active{ transform:translateY(4px); box-shadow:0 1px 0 #C34B33; }
+
+  .meta-table{ width:100%; border-collapse:collapse; margin-top:10px; font-size:15px; }
+  .meta-table td{ padding:8px 6px; border-bottom:1px solid var(--khaki-dark); }
+  .meta-table td:first-child{ font-weight:800; color:var(--jungle-dark); width:45%; }
+
+  .competence-box{
+    background:var(--khaki); border-left:6px solid var(--coral); border-radius:12px;
+    padding:16px 20px; margin-top:14px;
+  }
+  .competence-box h3{ font-size:22px; color:var(--jungle-dark); }
+
+  /* ---------- Letter grid ---------- */
+  .letter-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(120px,1fr)); gap:14px; margin-top:16px; }
+  .letter-card{
+    background:var(--khaki); border:none; border-radius:16px; padding:14px 8px;
+    text-align:center; cursor:pointer; transition:transform .15s ease, background .15s ease;
+    font-family:'Nunito',sans-serif;
+  }
+  .letter-card:hover{ transform:translateY(-4px) scale(1.03); background:var(--sun); }
+  .letter-card .big{ font-family:'Fredoka',sans-serif; font-size:30px; color:var(--jungle-dark); font-weight:700; }
+  .letter-card .emoji{ font-size:28px; display:block; margin:4px 0; }
+  .letter-card .phoneme{ font-size:13px; color:var(--brown); font-weight:700; }
+  .letter-card .word{ font-size:12px; color:var(--jungle); }
+
+  .video-wrap{
+    position:relative; padding-bottom:56.25%; height:0; border-radius:18px; overflow:hidden;
+    border:4px solid var(--khaki-dark); margin-top:14px;
+  }
+  .video-wrap iframe{ position:absolute; top:0; left:0; width:100%; height:100%; border:0; }
+
+  .practice-box{
+    background:var(--sky); border-radius:16px; padding:18px; margin-top:16px; text-align:center;
+  }
+  .practice-box .letter-display{ font-family:'Fredoka',sans-serif; font-size:54px; color:var(--jungle-dark); }
+  .practice-box button{
+    font-family:'Fredoka',sans-serif; background:var(--jungle); color:#fff; border:none;
+    padding:10px 22px; border-radius:999px; cursor:pointer; margin-top:10px; font-size:15px;
+  }
+
+  /* ---------- Play game ---------- */
+  .game-picture{ font-size:70px; text-align:center; margin:10px 0; }
+  .choice-row{ display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top:6px; }
+  .choice-btn{
+    font-family:'Fredoka',sans-serif; font-size:24px; font-weight:700;
+    width:60px; height:60px; border-radius:14px;
+    border:3px solid var(--leaf); background:#fff; color:var(--jungle-dark);
+    cursor:pointer; transition:all .15s ease;
+  }
+  .choice-btn:hover{ background:var(--sun); }
+  .feedback{ text-align:center; font-family:'Fredoka',sans-serif; font-size:17px; min-height:26px; margin-top:10px; }
+  .feedback.good{ color:#2E9B5C; }
+  .feedback.retry{ color:var(--coral); }
+  .score-pill{
+    display:inline-block; background:var(--leaf); color:#fff; font-family:'Fredoka',sans-serif;
+    padding:5px 14px; border-radius:999px; font-size:13px; margin-left:6px;
+  }
+
+  .activity-item{ display:flex; gap:14px; align-items:flex-start; margin-bottom:14px;
+    background:var(--khaki); border-radius:16px; padding:14px 16px; }
+  .activity-item .icon{ font-size:28px; }
+
+  footer{ text-align:center; padding:20px; font-size:13px; color:var(--jungle-dark); position:relative; z-index:1; }
+</style>
+</head>
+<body>
+
+<svg class="leaf-decor tl" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><path d="M0,0 Q100,0 100,100 Q100,0 0,0 Z" fill="#6FAE5E"/><path d="M0,0 Q0,100 100,100 Q0,100 0,0 Z" fill="#2F6B4F"/></svg>
+<svg class="leaf-decor br" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><path d="M0,0 Q100,0 100,100 Q100,0 0,0 Z" fill="#6FAE5E"/><path d="M0,0 Q0,100 100,100 Q0,100 0,0 Z" fill="#2F6B4F"/></svg>
+
+<div class="topbar">
+  <button class="nav-btn active" data-target="home">🏕️ Home</button>
+  <button class="nav-btn" data-target="about">🧭 About</button>
+  <button class="nav-btn" data-target="learn">🔤 Learn</button>
+  <button class="nav-btn" data-target="play">🦁 Play</button>
+  <button class="nav-btn" data-target="reflect">📝 Reflect</button>
+</div>
+
+<main>
+
+  <!-- ============ HOME ============ -->
+  <section id="home" class="active">
+    <div class="hero">
+      <div class="jump-letters" id="jumpLetters"></div>
+      <svg class="explorer-kid" viewBox="0 0 160 180" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="80" cy="170" rx="45" ry="8" fill="#DFCB99" opacity="0.6"/>
+        <rect x="45" y="95" width="70" height="65" rx="18" fill="#F2B441"/>
+        <circle cx="80" cy="65" r="40" fill="#F7C89B"/>
+        <path d="M40 60 Q80 15 120 60 L118 45 Q80 25 42 45 Z" fill="#5B3E23"/>
+        <ellipse cx="80" cy="35" rx="46" ry="14" fill="#EFE3C4"/>
+        <rect x="34" y="30" width="92" height="10" rx="5" fill="#2F6B4F"/>
+        <circle cx="66" cy="68" r="5" fill="#5B3E23"/>
+        <circle cx="94" cy="68" r="5" fill="#5B3E23"/>
+        <path d="M64 82 Q80 92 96 82" stroke="#5B3E23" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+        <rect x="58" y="115" width="44" height="30" rx="4" fill="#fff" stroke="#2F6B4F" stroke-width="2"/>
+        <text x="80" y="135" font-size="16" text-anchor="middle" font-family="Fredoka">ABC</text>
+      </svg>
+      <h1>I Can Associate Sounds With Letters!</h1>
+      <div class="sub">🌿 Sound Safari — A Phonics Adventure for Little Explorers 🌿</div>
+      <button class="start-btn" onclick="showSection('learn')">Begin the Safari →</button>
+    </div>
+
+    <div class="card">
+      <div class="tag">Student Details</div>
+      <table class="meta-table">
+        <tr><td>Student Name</td><td>Wanditi Barbra</td></tr>
+        <tr><td>Registration No.</td><td>2026/MT01/01377U</td></tr>
+        <tr><td>Study Centre</td><td>Cosa Nursery Teacher Training Institute</td></tr>
+        <tr><td>Course Code</td><td>DCEX1103</td></tr>
+        <tr><td>Course Name</td><td>Information and Communication Technologies in Early Childhood Care and Education</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============ ABOUT ============ -->
+  <section id="about">
+    <div class="card">
+      <div class="tag">Student Details</div>
+      <table class="meta-table">
+        <tr><td>Student Name</td><td>Wanditi Barbra</td></tr>
+        <tr><td>Registration No.</td><td>2026/MT01/01377U</td></tr>
+        <tr><td>Study Centre</td><td>Cosa Nursery Teacher Training Institute</td></tr>
+        <tr><td>Course Code</td><td>DCEX1103</td></tr>
+        <tr><td>Course Name</td><td>Information and Communication Technologies in Early Childhood Care and Education</td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <div class="tag">Target Competence</div>
+      <div class="competence-box">
+        <h3>"I can associate sounds with letters."</h3>
+      </div>
+      <p style="margin-top:16px;"><strong>Age Group:</strong> 5–6 years</p>
+      <p><strong>Purpose:</strong> Sound Safari helps young children learn to recognize letter sounds A–M and connect them to letters. Through pictures, sounds, and games, children build phonics skills for reading.</p>
+    </div>
+
+    <div class="card">
+      <div class="tag">ICT Tools Used</div>
+      <ul>
+        <li>Google Sites</li>
+        <li>Images and Audio</li>
+        <li>Videos and Songs</li>
+        <li>Interactive Games</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ LEARN ============ -->
+  <section id="learn">
+    <div class="card">
+      <div class="tag">Letter Wall</div>
+      <h2>Let's Learn Letters A–M!</h2>
+      <p>Click each letter to hear its sound!</p>
+      <div class="letter-grid" id="letterGrid"></div>
+    </div>
+
+    <div class="card">
+      <div class="tag">Video Corner</div>
+      <h2>Phonics Song A–M</h2>
+      <div class="video-wrap">
+        <iframe src="https://www.youtube.com/embed/BELlZKpi1Zs" title="Phonics Song" allowfullscreen></iframe>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="tag">Song Time</div>
+      <h2>"ABC Phonics Song"</h2>
+      <p>Sing along and learn the sounds! Press play above and clap along to each letter sound as it appears.</p>
+    </div>
+
+    <div class="card">
+      <div class="tag">Activity</div>
+      <h2>Say the Sound, Say a Word!</h2>
+      <p>Say the sound, then say a word that starts with that letter. Example: /b/ ... ball!</p>
+      <div class="practice-box">
+        <div class="letter-display" id="practiceLetter">B</div>
+        <div id="practiceHint">/b/ ... like <strong>ball</strong> ⚽</div>
+        <button onclick="nextPractice()">Next Letter 🔁</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PLAY ============ -->
+  <section id="play">
+    <div class="card">
+      <div class="tag">Safari Match-Up</div>
+      <h2>Which letter does this word start with?</h2>
+      <div class="game-picture" id="gamePic">🍎</div>
+      <div class="choice-row" id="choiceRow"></div>
+      <div class="feedback" id="feedback"></div>
+      <div style="text-align:center;">Score: <span class="score-pill" id="scorePill">0 🌟</span></div>
+    </div>
+    <div class="card">
+      <h3>More Safari Play</h3>
+      <div class="activity-item"><span class="icon">🎧</span><div><strong>Listen & Repeat:</strong> Tap a letter on the Learn page, then repeat the sound out loud three times.</div></div>
+      <div class="activity-item"><span class="icon">🏠</span><div><strong>Home Safari Hunt:</strong> Find 3 things at home that start with a letter you learned today.</div></div>
+      <div class="activity-item"><span class="icon">🎨</span><div><strong>Draw It:</strong> Draw a picture of your favourite animal from the letter wall (cat, dog, elephant, goat, or lion!).</div></div>
+    </div>
+  </section>
+
+  <!-- ============ REFLECT ============ -->
+  <section id="reflect">
+    <div class="card">
+      <div class="tag">Teacher's Reflection</div>
+      <h2>Reflecting on Sound Safari</h2>
+      <p><em>(Starter draft — personalize this in your own words before submitting)</em></p>
+      <p><strong>Effectiveness:</strong> Sound Safari supports the competence "I can associate sounds with letters" by pairing each letter with a picture, a sound, and a familiar animal or object, so children build the sound-letter connection through repetition and play rather than memorization alone.</p>
+      <p><strong>Children's participation:</strong> I expect children to enjoy the clickable letter wall most, since it gives instant sound feedback. The match-up game encourages active guessing rather than passive listening, which should hold attention well for this age group.</p>
+      <p><strong>Strengths:</strong> The site combines visuals, sound, video, and a hands-on game, reflecting the TPACK framework by linking content (letter sounds), pedagogy (play-based learning), and technology (interactive site tools).</p>
+      <p><strong>Challenges:</strong> Sourcing free, child-safe multimedia for every letter A–M took time, and not every home will have reliable internet to play the videos smoothly.</p>
+      <p><strong>Improvements:</strong> Future versions could include a printable safari-themed worksheet for offline practice and audio in the local language for extra support.</p>
+    </div>
+  </section>
+
+</main>
+
+<footer>Sound Safari — Prototype design for DCEX1103, ICTs in ECCE • Wanditi Barbra</footer>
+
+<script>
+  // ---------- Navigation ----------
+  const navBtns = document.querySelectorAll('.nav-btn');
+  navBtns.forEach(btn=>{ btn.addEventListener('click', ()=> showSection(btn.dataset.target)); });
+  function showSection(id){
+    document.querySelectorAll('section').forEach(s=>s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    navBtns.forEach(b=> b.classList.toggle('active', b.dataset.target===id));
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+
+  // ---------- Data: A-M ----------
+  const data = [
+    {l:'A', phon:'/a/', word:'apple', emoji:'🍎', color:'#F0765A'},
+    {l:'B', phon:'/b/', word:'ball', emoji:'⚽', color:'#F2B441'},
+    {l:'C', phon:'/c/', word:'cat', emoji:'🐱', color:'#6FAE5E'},
+    {l:'D', phon:'/d/', word:'dog', emoji:'🐶', color:'#8FD3E8'},
+    {l:'E', phon:'/e/', word:'elephant', emoji:'🐘', color:'#F0765A'},
+    {l:'F', phon:'/f/', word:'fish', emoji:'🐟', color:'#F2B441'},
+    {l:'G', phon:'/g/', word:'goat', emoji:'🐐', color:'#6FAE5E'},
+    {l:'H', phon:'/h/', word:'hat', emoji:'🎩', color:'#8FD3E8'},
+    {l:'I', phon:'/i/', word:'igloo', emoji:'🧊', color:'#F0765A'},
+    {l:'J', phon:'/j/', word:'jar', emoji:'🫙', color:'#F2B441'},
+    {l:'K', phon:'/k/', word:'key', emoji:'🔑', color:'#6FAE5E'},
+    {l:'L', phon:'/l/', word:'lion', emoji:'🦁', color:'#8FD3E8'},
+    {l:'M', phon:'/m/', word:'mango', emoji:'🥭', color:'#F0765A'},
+  ];
+
+  // Jump letters on Home
+  const jumpWrap = document.getElementById('jumpLetters');
+  const jumpColors = ['#F0765A','#F2B441','#6FAE5E','#8FD3E8','#2F6B4F'];
+  'ABCDEFGHIJKLM'.split('').forEach((ch,i)=>{
+    const s = document.createElement('span');
+    s.textContent = ch;
+    s.style.background = jumpColors[i % jumpColors.length];
+    s.style.animationDelay = (i*0.1)+'s';
+    jumpWrap.appendChild(s);
+  });
+
+  // Letter grid on Learn
+  const grid = document.getElementById('letterGrid');
+  data.forEach(item=>{
+    const b = document.createElement('button');
+    b.className = 'letter-card';
+    b.innerHTML = `<span class="big">${item.l}</span><span class="emoji">${item.emoji}</span><span class="phoneme">${item.phon}</span><span class="word">${item.word}</span>`;
+    b.addEventListener('click', ()=> speak(item.l + ' says ' + item.phon.replace(/\//g,'') + ', like in ' + item.word));
+    grid.appendChild(b);
+  });
+
+  function speak(text){
+    if('speechSynthesis' in window){
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      u.rate = 0.85; u.pitch = 1.05;
+      window.speechSynthesis.speak(u);
+    }
+  }
+
+  // Practice box
+  let practiceIdx = 1; // start at B like the example
+  function updatePractice(){
+    const item = data[practiceIdx % data.length];
+    document.getElementById('practiceLetter').textContent = item.l;
+    document.getElementById('practiceHint').innerHTML = item.phon + ' ... like <strong>' + item.word + '</strong> ' + item.emoji;
+    speak(item.phon.replace(/\//g,''));
+  }
+  function nextPractice(){ practiceIdx++; updatePractice(); }
+  updatePractice();
+
+  // ---------- Play matching game ----------
+  let gi = 0, score = 0;
+  const gamePic = document.getElementById('gamePic');
+  const choiceRow = document.getElementById('choiceRow');
+  const feedback = document.getElementById('feedback');
+  const scorePill = document.getElementById('scorePill');
+
+  function pickChoices(correctIdx){
+    const pool = [...Array(data.length).keys()].filter(i=>i!==correctIdx);
+    const wrong = [];
+    while(wrong.length < 2 && pool.length){
+      const idx = Math.floor(Math.random()*pool.length);
+      wrong.push(pool.splice(idx,1)[0]);
+    }
+    return [correctIdx, ...wrong].sort(()=>Math.random()-0.5);
+  }
+
+  function loadGame(){
+    const correctIdx = gi % data.length;
+    const item = data[correctIdx];
+    gamePic.textContent = item.emoji;
+    feedback.textContent = ''; feedback.className = 'feedback';
+    choiceRow.innerHTML = '';
+    const choiceIdxs = pickChoices(correctIdx);
+    choiceIdxs.forEach(idx=>{
+      const btn = document.createElement('button');
+      btn.className = 'choice-btn';
+      btn.textContent = data[idx].l;
+      btn.addEventListener('click', ()=>{
+        if(idx === correctIdx){
+          feedback.textContent = 'Yes! Great safari spotting! 🎉';
+          feedback.className = 'feedback good';
+          score++; scorePill.textContent = score + ' 🌟';
+          speak('Yes! ' + item.l + ' is correct!');
+          setTimeout(()=>{ gi++; loadGame(); }, 1100);
+        } else {
+          feedback.textContent = 'Almost — listen again and try once more!';
+          feedback.className = 'feedback retry';
+          speak('Try again!');
+        }
+      });
+      choiceRow.appendChild(btn);
+    });
+  }
+  loadGame();
+</script>
+
+</body>
+</html>
